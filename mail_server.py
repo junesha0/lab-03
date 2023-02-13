@@ -8,8 +8,8 @@ import json
 app = Flask(__name__)
 thisdir = pathlib.Path(__file__).parent.absolute() # path to directory of this file
 
-# Function to load and save the mail to/from the json file
 
+# Function to load and save the mail to/from the json file
 def load_mail() -> List[Dict[str, str]]:
     """
     Loads the mail from the json file
@@ -22,23 +22,30 @@ def load_mail() -> List[Dict[str, str]]:
     except FileNotFoundError:
         return []
 
+
 def save_mail(mail: List[Dict[str, str]]) -> None:
     """
-    Writes the list to a json format, and then writes it to the file mail_db.json.
-    Return:
-    Nothing.
-    Args:
+    Converts mail into a json string and writes the string to 'mail_db.json' in the current directory
     
+    Args:
+    	mail (List[Dict[str, str]]): A list of dictionaries representing the mail entries
+
+    Returns:
+       Nothing.
     """
     thisdir.joinpath('mail_db.json').write_text(json.dumps(mail, indent=4))
+
 
 def add_mail(mail_entry: Dict[str, str]) -> str:
     """
     Adds the mail entry into mail inbox, by appending it to the end of the list of dictionaries. Then, generates a unique ID for that mail entry.
     It then saves the new mail inbox with the added mail. Then, returns the mail entry id.
     
-    Return:
-    Mail entry ID
+    Args:
+    	mail_entry (Dict[str, str]): a dictionary representing a mail entry
+    	
+    Returns:
+    	str: the id of the mail entry
     """
     mail = load_mail()
     mail.append(mail_entry)
@@ -46,13 +53,17 @@ def add_mail(mail_entry: Dict[str, str]) -> str:
     save_mail(mail)
     return mail_entry['id']
 
+
 def delete_mail(mail_id: str) -> bool:
     """
     If the mail ID exists, delete the mail and then save the mail. Then return TRUE for having deleted the mail. If the mail ID does not exist,
     If the mail ID does not exist, just return FALSE
     
-    Return:
-    Return TRUE if mail id exists and delete, Return FALSE if mail id does not exist
+    Args:
+    	mail_id (str): the id of the mail entry
+    	
+    Returns:
+    	bool: True for success, false otherwise
     """
     mail = load_mail()
     for i, entry in enumerate(mail):
@@ -63,13 +74,18 @@ def delete_mail(mail_id: str) -> bool:
 
     return False
 
-def get_mail(mail_id: str) -> Optional[Dict[str, str]]: # -> indicates return type, : is so you have (variablename: variabletype) for argument
+
+def get_mail(mail_id: str) -> Optional[Dict[str, str]]:
     """
+    Gets a mail entry from the json file:
     Checks all the dictionaries (mails) in the list of mails; checks the definition listed under all "id"s, and checks if it matches the mail id
     If it does, return the mail entry dictionary. If there is no mail matching the id, return nothing
     
-    Return:
-    Return mail entry if the ID exists; if it does not, return nothing
+    Args:
+    	mail_id (str): the id of the mail entry
+    
+    Returns:
+    	(Optional) Dict: A Dictionary representing the mail entry if found. If entry doesn't exist, returns None
     """
     mail = load_mail()
     for entry in mail:
@@ -78,11 +94,16 @@ def get_mail(mail_id: str) -> Optional[Dict[str, str]]: # -> indicates return ty
 
     return None
 
+
 def get_inbox(recipient: str) -> List[Dict[str, str]]:
     """
     Gets all entry to a specific recipient from all mail, by checking all dictionaries in list for the definition under "Recipient"
+    
+    Args:
+    	recipient (str): the recipient of the mail
+    	
     Returns:
-    	all entries (dictionary) from the mail inbox to a recipient
+    	list: A list of dictionaries representing the recepient's inbox
     """
     mail = load_mail()
     inbox = []
@@ -92,11 +113,16 @@ def get_inbox(recipient: str) -> List[Dict[str, str]]:
 
     return inbox
 
+
 def get_sent(sender: str) -> List[Dict[str, str]]:
     """
     Gets all entry from a specific sender from all mail, by checking all dictionaries in list for the definition under "Sender"
+    
+    Args:
+    	sender (str): the sender of the mail
+    	
     Returns:
-    	all entries from the mail inbox from the sender
+    	list: A list of dictionaries representing the sent mail
     """
     mail = load_mail()
     sent = []
@@ -105,6 +131,7 @@ def get_sent(sender: str) -> List[Dict[str, str]]:
             sent.append(entry)
 
     return sent
+
 
 # API routes - these are the endpoints that the client can use to interact with the server
 @app.route('/mail', methods=['POST'])
@@ -115,11 +142,12 @@ def add_mail_route():
     Returns:
         str: The id of the new mail entry
     """
-    mail_entry = request.get_json()
-    mail_id = add_mail(mail_entry)
+    mail_entry = request.get_json() # mail entry is a dictionary
+    mail_id = add_mail(mail_entry) 
     res = jsonify({'id': mail_id})
     res.status_code = 201 # Status code for "created"
     return res
+
 
 @app.route('/mail/<mail_id>', methods=['DELETE'])
 def delete_mail_route(mail_id: str):
@@ -141,6 +169,7 @@ def delete_mail_route(mail_id: str):
     	res.status_code = 404
     return res
 
+
 @app.route('/mail/<mail_id>', methods=['GET'])
 def get_mail_route(mail_id: str):
     """
@@ -155,6 +184,7 @@ def get_mail_route(mail_id: str):
     res = jsonify(get_mail(mail_id))
     res.status_code = 200 # Status code for "ok"
     return res
+
 
 @app.route('/mail/inbox/<recipient>', methods=['GET'])
 def get_inbox_route(recipient: str):
@@ -171,11 +201,12 @@ def get_inbox_route(recipient: str):
     res.status_code = 200
     return res
 
-# TODO: implement a rout e to get all mail entries for a sender
+
+# TODO: implement a route to get all mail entries for a sender
 # HINT: start with soemthing like this:
 #   @app.route('/mail/sent/<sender>', ...)
 @app.route('/mail/sent/<sender>', methods=['GET'])
-def get_sender_route(sender: str):
+def get_sent_route(sender: str):
 	"""
 	Summary: Gets all the messages sent by sender from the output of get_sent
 	
@@ -189,6 +220,7 @@ def get_sender_route(sender: str):
 	res = jsonify(get_sent(sender))
 	res.status_code = 200
 	return res
+  
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
