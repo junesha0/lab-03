@@ -32,11 +32,16 @@ def send_mail(recipient: str, sender: str, subject: str, body: str) -> bool:
     pprint.pprint(response.json())
 
 def get_inbox(recipient: str) -> None:
-    """Gets the inbox of a recipient from the server by making a GET request to the /mail/inbox/{recipient} endpoint
-    The JSON body contains a key for the recipient
+    """
+    Gets the inbox of a recipient from the server by making a GET request to the /mail/inbox/{recipient} endpoint
+    The JSON body of the request contains a key for the recipient. Then turns the json object into a java object 
+    and prints it
     
     Args: 
     	recipient (str): The recipient of the mail
+      
+    Returns:
+    	Nothing
     """
     response = requests.get(f'{SERVER}/mail/inbox/{recipient}')
     pprint.pprint(response.json())
