@@ -15,4 +15,4 @@ Between the mail server and client, the resources are the mail entries. The serv
 Answer for Question 3:
 
 Answer for Question 4:
-Many RESTful APIs have keys to prevent malicious use of them. API keys limit the access to an API so only applications with the key can receive from and possibly edit information on the server. Different keys may have different access levels, so not everyone would be able to edit the resources on a server. 
+Many RESTful APIs have keys to prevent malicious use of them. API keys limit the access to an API so only applications with the key can receive from and possibly edit information on the server. Different keys may have different access levels, so not everyone would be able to edit the resources on a server. (https://blog.hubspot.com/website/api-keys)
