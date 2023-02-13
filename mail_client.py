@@ -32,7 +32,14 @@ def send_mail(recipient: str, sender: str, subject: str, body: str) -> bool:
     pprint.pprint(response.json())
 
 def get_inbox(recipient: str) -> None:
-    """TODO: fill out this docstring (using the send_mail docstring as a guide)
+    """
+    Gets the server output of the inbox/{recipient} route, and then returns the json
+    object. Then, it turns the json object into a java object and prints it
+    
+    Args:
+    	recipient(str): Recipient of the mail
+    Returns:
+    	Nothing
     """
     response = requests.get(f'{SERVER}/mail/inbox/{recipient}')
     pprint.pprint(response.json())

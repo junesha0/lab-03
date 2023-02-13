@@ -23,12 +23,22 @@ def load_mail() -> List[Dict[str, str]]:
         return []
 
 def save_mail(mail: List[Dict[str, str]]) -> None:
-    """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    """
+    Writes the list to a json format, and then writes it to the file mail_db.json.
+    Return:
+    Nothing.
+    Args:
+    
     """
     thisdir.joinpath('mail_db.json').write_text(json.dumps(mail, indent=4))
 
 def add_mail(mail_entry: Dict[str, str]) -> str:
-    """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    """
+    Adds the mail entry into mail inbox, by appending it to the end of the list of dictionaries. Then, generates a unique ID for that mail entry.
+    It then saves the new mail inbox with the added mail. Then, returns the mail entry id.
+    
+    Return:
+    Mail entry ID
     """
     mail = load_mail()
     mail.append(mail_entry)
@@ -37,7 +47,12 @@ def add_mail(mail_entry: Dict[str, str]) -> str:
     return mail_entry['id']
 
 def delete_mail(mail_id: str) -> bool:
-    """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    """
+    If the mail ID exists, delete the mail and then save the mail. Then return TRUE for having deleted the mail. If the mail ID does not exist,
+    If the mail ID does not exist, just return FALSE
+    
+    Return:
+    Return TRUE if mail id exists and delete, Return FALSE if mail id does not exist
     """
     mail = load_mail()
     for i, entry in enumerate(mail):
@@ -48,8 +63,13 @@ def delete_mail(mail_id: str) -> bool:
 
     return False
 
-def get_mail(mail_id: str) -> Optional[Dict[str, str]]:
-    """TODO: fill out this docstring (using the load_mail docstring as a guide)
+def get_mail(mail_id: str) -> Optional[Dict[str, str]]: # -> indicates return type, : is so you have (variablename: variabletype) for argument
+    """
+    Checks all the dictionaries (mails) in the list of mails; checks the definition listed under all "id"s, and checks if it matches the mail id
+    If it does, return the mail entry dictionary. If there is no mail matching the id, return nothing
+    
+    Return:
+    Return mail entry if the ID exists; if it does not, return nothing
     """
     mail = load_mail()
     for entry in mail:
@@ -59,7 +79,10 @@ def get_mail(mail_id: str) -> Optional[Dict[str, str]]:
     return None
 
 def get_inbox(recipient: str) -> List[Dict[str, str]]:
-    """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    """
+    Gets all entry to a specific recipient from all mail, by checking all dictionaries in list for the definition under "Recipient"
+    Returns:
+    	all entries (dictionary) from the mail inbox to a recipient
     """
     mail = load_mail()
     inbox = []
@@ -70,7 +93,10 @@ def get_inbox(recipient: str) -> List[Dict[str, str]]:
     return inbox
 
 def get_sent(sender: str) -> List[Dict[str, str]]:
-    """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    """
+    Gets all entry from a specific sender from all mail, by checking all dictionaries in list for the definition under "Sender"
+    Returns:
+    	all entries from the mail inbox from the sender
     """
     mail = load_mail()
     sent = []
@@ -107,7 +133,13 @@ def delete_mail_route(mail_id: str):
         bool: True if the mail was deleted, False otherwise
     """
     # TODO: implement this function
-    pass # remove this line
+    if delete_mail(mail_id) == True:
+    	res = jsonify("Deleted")
+    	res.status_code = 200
+    else:
+    	res = jsonify("Not Found")
+    	res.status_code = 404
+    return res
 
 @app.route('/mail/<mail_id>', methods=['GET'])
 def get_mail_route(mail_id: str):
@@ -142,7 +174,21 @@ def get_inbox_route(recipient: str):
 # TODO: implement a rout e to get all mail entries for a sender
 # HINT: start with soemthing like this:
 #   @app.route('/mail/sent/<sender>', ...)
-
+@app.route('/mail/sent/<sender>', methods=['GET'])
+def get_sender_route(sender: str):
+	"""
+	Summary: Gets all the messages sent by sender from the output of get_sent
+	
+	Args:
+		sender(str): sender of the mail
+		
+	Returns:
+		list of dictionaries of emails of sender in json syntax (since json is a syntax for java objects?)
+		
+	"""
+	res = jsonify(get_sent(sender))
+	res.status_code = 200
+	return res
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
